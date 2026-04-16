@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>垂直科技 | 好兔运动官网 - AI赋能体育摄影</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,900&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="preload" as="image" href="1.jpg">
+
+    <style>
+        /* ================= 核心变量 ================= */
+        :root {
+            --bg-color: #03050a; 
+            --text-main: #ffffff;
+            --text-muted: #8b96a5;
+            --brand-blue: #00E5FF;
+            --brand-blue-glow: rgba(0, 229, 255, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --side-padding: 40px;      
+            --hero-left-offset: 162px; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Noto Sans SC', sans-serif; background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; line-height: 1.6; }
+        ::-webkit-scrollbar { display: none; }
+
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px; z-index: -2; pointer-events: none;
+        }
+
+        /* ================= 基础排版 ================= */
+        .heavy-italic { font-family: 'Montserrat', sans-serif; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -1px; display: inline-block; width: fit-content; overflow: visible !important; padding-right: 0.15em; }
+        h1.heavy-italic { padding-right: 0.4em !important; }
+        .gradient-text { background: linear-gradient(90deg, #fff 0%, var(--brand-blue) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 12px; }
+        .skew-box { transform: skewX(-10deg); overflow: hidden; border-radius: 4px; }
+        .unskew { transform: skewX(10deg); display: inline-block; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2;}
+        .center-title-box { text-align: center; width: 100%; margin-bottom: 50px; }
+        .ambient-light { position: fixed; top: 0; left: 0; width: 50vw; height: 50vw; background: radial-gradient(circle, var(--brand-blue-glow) 0%, rgba(0,0,0,0) 70%); z-index: -1; opacity: 0.4; filter: blur(90px); pointer-events: none; }
+        
+        /* 硬件加速，防止滚动掉帧 */
+        .gs-reveal { will-change: transform, opacity; }
+
+        /* ================= 导航栏 ================= */
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; padding: 25px var(--side-padding); z-index: 999; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .navbar.scrolled { background: rgba(3, 5, 10, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); padding: 15px var(--side-padding); }
+        .logo { font-size: 1.3rem; z-index: 1000; position: relative;}
+        .logo span { font-weight: 400; color: var(--text-muted); margin: 0 5px; }
+        .nav-links { display: flex; gap: 30px; align-items: center; transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1); }
+        .nav-links a { color: #fff; text-decoration: none; font-weight: 700; font-size: 0.9rem; transition: color 0.3s;}
+        .nav-links a:hover { color: var(--brand-blue); }
+        
+        /* 汉堡菜单按钮 (移动端专用) */
+        .menu-toggle { display: none; flex-direction: column; gap: 6px; cursor: pointer; z-index: 1000; padding: 10px; margin-right: -10px;}
+        .menu-toggle span { width: 24px; height: 2px; background: #fff; transition: 0.3s; transform-origin: left center;}
+        .menu-toggle.is-active span:nth-child(1) { transform: rotate(45deg); }
+        .menu-toggle.is-active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.is-active span:nth-child(3) { transform: rotate(-45deg); }
+
+        /* ================= 首屏 ================= */
+        .hero { position: relative; height: 100vh; min-height: 600px; display: flex; align-items: center; justify-content: flex-start; }
+        .hero-bg-slider { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+        .slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transform: scale(1.08); transition: opacity 1.5s ease-in-out, transform 6s linear; }
+        .slide.active { opacity: 1; transform: scale(1); }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(90deg, #03050a 0%, rgba(3,5,10,0.7) 45%, transparent 100%), linear-gradient(to bottom, rgba(3,5,10,0.1) 0%, #03050a 100%); z-index: 1; }
+
+        .hero-container { position: relative; z-index: 2; width: 100%; padding-left: var(--hero-left-offset); }
+        .hero h1 { font-size: 5rem; line-height: 1.05; text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .hero-subtitle { font-size: 1.25rem; font-weight: 400; color: #cbd5e1; margin: 30px 0 40px; max-width: 580px; line-height: 1.6; }
+        
+        .hero-btns { display: flex; gap: 20px; flex-wrap: wrap; }
+        .btn-skew { padding: 16px 35px; text-decoration: none; transform: skewX(-15deg); transition: 0.3s; display: inline-flex; justify-content: center; min-width: 160px; position: relative; overflow: hidden; }
+        .btn-primary { background: var(--brand-blue); color: #000; box-shadow: 0 0 20px var(--brand-blue-glow); }
+        .btn-primary::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent); transform: skewX(-25deg); animation: sweep 3s infinite; }
+        @keyframes sweep { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+        .btn-outline { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; backdrop-filter: blur(10px); }
+
+        /* ================= 数据与方案 ================= */
+        .social-proof { padding: 80px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; text-align: center; }
+        .stat-item h3 { font-size: 3.5rem; margin-bottom: 10px; }
+
+        .solutions { padding: 80px 0; }
+        .z-row { display: flex; align-items: center; gap: 80px; margin-bottom: 100px; }
+        .z-row:nth-child(even) { flex-direction: row-reverse; }
+        .z-text { flex: 1; }
+        .z-text h3 { font-size: 2.2rem; margin-bottom: 20px; }
+        .z-img-placeholder { flex: 1; height: 400px; position: relative; background: transparent; transform-style: preserve-3d; perspective: 1000px; width: 100%;}
+        .z-img-placeholder::before, .z-img-placeholder::after { content: ''; position: absolute; inset: 0; border-radius: 12px; transition: transform 0.6s ease; }
+        .z-img-placeholder::before { border: 2px dashed rgba(0, 229, 255, 0.3); transform: translateZ(-20px) translateX(15px) translateY(15px); }
+        .z-img-placeholder::after { background: linear-gradient(135deg, #111, #222); border: 1px solid var(--brand-blue); display: flex; align-items: center; justify-content: center; content: '等待配图'; color: var(--brand-blue); font-weight: 900; font-style: italic; }
+        
+        /* 电脑端才有的 Hover 效果 */
+        @media (hover: hover) {
+            .btn-skew:hover { background: #fff; color: #000; transform: skewX(-15deg) translateY(-2px); }
+            .z-row:hover .z-img-placeholder::before { transform: translateZ(-40px) translateX(30px) translateY(30px); border-color: var(--brand-blue); }
+        }
+
+        /* ================= 商业与案例 ================= */
+        .moat { padding: 100px 0; background: linear-gradient(180deg, transparent 0%, #0a1120 100%); }
+        .moat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 40px; }
+        .moat-card { padding: 40px 20px; text-align: center; }
+        .moat-icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+
+        .cases { padding: 100px 0; }
+        .tab-buttons { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap;}
+        .tab-btn { background: transparent; color: var(--text-muted); border: none; font-size: 1rem; font-weight: 700; cursor: pointer; padding: 10px 15px; position: relative; }
+        .tab-btn.active { color: var(--brand-blue); }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: 0; left: 10%; width: 80%; height: 3px; background: var(--brand-blue); transform: skewX(-20deg); }
+        
+        .tab-content { display: none; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .tab-content.active { display: grid; }
+        
+        .case-card { position: relative; height: 280px; border-radius: 12px; overflow: hidden; }
+        .case-bg { position: absolute; inset: 0; background-size: cover; background-position: center; background-color: #222; transition: transform 0.6s; }
+        .case-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px 20px 20px; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); transform: translateY(20px); transition: 0.4s; }
+        .case-info h4 { font-size: 1.1rem; color: #fff; margin-bottom: 5px; }
+        .case-info p { color: var(--brand-blue); font-size: 0.85rem; }
+        
+        @media (hover: hover) {
+            .case-card:hover .case-bg { transform: scale(1.1); }
+            .case-card:hover .case-info { transform: translateY(0); }
+        }
+
+        footer { padding: 80px 0 40px; text-align: center; border-top: 1px solid var(--glass-border); }
+
+        /* ================= 移动端终极适配 ================= */
+        @media (max-width: 1024px) { 
+            :root { --hero-left-offset: 40px; --side-padding: 20px; } 
+            .hero h1 { font-size: 4rem; } 
+            .z-row { gap: 40px; }
+        }
+        
+        @media (max-width: 768px) { 
+            /* 导航调整 */
+            .menu-toggle { display: flex; }
+            .nav-links { position: fixed; top: 0; right: 0; width: 100%; height: 100vh; background: rgba(3,5,10,0.98); flex-direction: column; justify-content: center; transform: translateX(100%); border-left: none; }
+            .nav-links.active { transform: translateX(0); }
+            .nav-links a { font-size: 1.2rem; padding: 15px; }
+
+            /* 首屏调整 */
+            .hero-overlay { background: linear-gradient(to bottom, rgba(3,5,10,0.4) 0%, #03050a 100%); }
+            .hero h1 { font-size: 2.8rem; } 
+            .hero-subtitle { font-size: 1rem; margin: 20px 0 30px;}
+            .hero-container { padding: 0 20px; margin-top: 60px;} /* 给汉堡菜单留空间 */
+            .hero-btns { flex-direction: column; width: 100%; }
+            .btn-skew { width: 100%; }
+
+            /* 布局转为单列 */
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .stat-item h3 { font-size: 2.5rem; }
+            .z-row, .z-row:nth-child(even) { flex-direction: column; gap: 30px; margin-bottom: 80px; }
+            .z-text h3 { font-size: 1.8rem; }
+            .z-img-placeholder { height: 250px; }
+            
+            /* 手机端取消伪3D位移，直接固定错位展示 */
+            .z-img-placeholder::before { transform: translateZ(-10px) translateX(10px) translateY(10px); }
+            
+            .moat-grid, .tab-content { grid-template-columns: 1fr; }
+            
+            /* 手机端案例卡片文字永远显示，取消Hover位移依赖 */
+            .case-info { transform: translateY(0); padding-bottom: 20px; }
+        }
+
+        /* 超小屏幕手机 (例如 iPhone SE) */
+        @media (max-width: 380px) {
+            .hero h1 { font-size: 2.3rem; }
+            .stat-item h3 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-light"></div>
+
+    <nav class="navbar">
+        <div class="logo heavy-italic">HOTU <span>|</span> 垂直科技&nbsp;</div>
+        <div class="menu-toggle" id="mobile-menu-btn">
+            <span></span><span></span><span></span>
+        </div>
+        <div class="nav-links" id="nav-links">
+            <a href="#solutions" class="nav-item">核心方案</a>
+            <a href="#moat" class="nav-item">商业护城河</a>
+            <a href="#cases" class="nav-item">标杆案例</a>
+            <a href="#contact" class="nav-item glass-panel" style="border-radius: 4px; border: 1px solid #fff;">联系我们</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-bg-slider" id="slider">
+            <div class="slide active" style="background-image: url('1.jpg');"></div>
+            <div class="slide" style="background-image: url('2.jpg');"></div>
+            <div class="slide" style="background-image: url('3.jpg');"></div>
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="heavy-italic">专注体育赛道&nbsp;</h1><br>
+                <h1 class="heavy-italic"><span class="gradient-text">赋能高光时刻&nbsp;</span></h1>
+                <p class="hero-subtitle regular-font">提供高精度图片/摄像直播与 3D 赛事数字资产解决方案，为赛事宣传与品牌营销全面提速。</p>
+                <div class="hero-btns">
+                    <a href="#" class="btn-skew btn-primary heavy-italic"><span class="unskew">iOS 端下载&nbsp;</span></a>
+                    <a href="#" class="btn-skew btn-outline heavy-italic"><span class="unskew">安卓端下载&nbsp;</span></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- （中间的 HTML 结构保持完全一致，为节省篇幅不重复列出） -->
+    <section class="social-proof">
+        <div class="container">
+            <div class="center-title-box gs-reveal">
+                <h2 class="heavy-italic section-title" style="display:inline-block">数字背后的<span class="gradient-text">信赖&nbsp;</span></h2>
+            </div>
+            <div class="stats-grid gs-reveal">
+                <div class="stat-item"><h3 class="heavy-italic counter" data-target="1000" data-suffix="+">0</h3><p>年度服务场次</p></div>
+                <div class="stat-item"><h3 class="heavy-italic counter" data-target="10" data-suffix="%">0</h3><p>上海市占率</p></div>
+                <div class="stat-item"><h3 class="heavy-italic counter" data-target="7000" data-suffix="+">0</h3><p>注册摄影师</p></div>
+                <div class="stat-item"><h3 class="heavy-italic counter" data-target="40" data-suffix="M+">0</h3><p>数字资产库</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="solutions container" id="solutions">
+        <div class="z-row gs-reveal">
+            <div class="z-text">
+                <h3 class="heavy-italic">赛事图片与<span class="gradient-text">摄像直播&nbsp;</span></h3>
+                <p>打破传统宣发延迟。7000+ 滴滴式精准约拍摄影师网络，赛事全程实时分发高质量大片。让运动员在完赛第一时间即可分享社交平台。</p>
+            </div>
+            <div class="z-img-placeholder skew-box"></div>
+        </div>
+        <div class="z-row gs-reveal">
+            <div class="z-text">
+                <h3 class="heavy-italic">AI 2D 转 <span class="gradient-text">3D 建模&nbsp;</span></h3>
+                <p>无需专业扫描设备。基于自研先进算法，将二维赛事照片瞬间转化为可交互的 3D 数字资产，颠覆传统观赛体验。</p>
+            </div>
+            <div class="z-img-placeholder skew-box"></div>
+        </div>
+        <div class="z-row gs-reveal">
+            <div class="z-text">
+                <h3 class="heavy-italic">3D 实体<span class="gradient-text">定制手办&nbsp;</span></h3>
+                <p>将数字化记忆降维实体化。基于高精度 3D 建模，直连云端 3D 打印。为大众跑者提供专属的情绪价值实体手办。</p>
+            </div>
+            <div class="z-img-placeholder skew-box"></div>
+        </div>
+    </section>
+
+    <section class="moat" id="moat">
+        <div class="container">
+            <div class="center-title-box gs-reveal">
+                <h2 class="heavy-italic section-title" style="display:inline-block">体育商业的<span class="gradient-text">核心引擎&nbsp;</span></h2>
+            </div>
+            <div class="moat-grid">
+                <div class="moat-card glass-panel gs-reveal"><i class="moat-icon">📷</i><h4 class="heavy-italic">摄影师池&nbsp;</h4><p>“滴滴式”约拍精准调度。</p></div>
+                <div class="moat-card glass-panel gs-reveal"><i class="moat-icon">💾</i><h4 class="heavy-italic">运动照片池&nbsp;</h4><p>千万级高质量图库燃料。</p></div>
+                <div class="moat-card glass-panel gs-reveal"><i class="moat-icon">🎯</i><h4 class="heavy-italic">运动流量池&nbsp;</h4><p>赋能品牌精准曝光变现。</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cases container" id="cases">
+        <div class="center-title-box gs-reveal">
+            <h2 class="heavy-italic section-title" style="display:inline-block">标杆<span class="gradient-text">案例&nbsp;</span></h2>
+        </div>
+        <div class="tab-buttons gs-reveal">
+            <button class="tab-btn active" data-tab="pro">职业联赛</button>
+            <button class="tab-btn" data-tab="mass">大众赛事</button>
+            <button class="tab-btn" data-tab="gov">官方合作</button>
+        </div>
+        
+        <div class="tab-content active" id="pro">
+            <div class="case-card glass-panel gs-reveal"><div class="case-bg"></div><div class="case-info"><h4>WCBA 上海女篮主场</h4><p>官方指定摄影伙伴</p></div></div>
+            <div class="case-card glass-panel gs-reveal"><div class="case-bg"></div><div class="case-info"><h4>国际帆板大师赛</h4><p>高难度水上直播</p></div></div>
+            <div class="case-card glass-panel gs-reveal"><div class="case-bg"></div><div class="case-info"><h4>大乒锦标赛</h4><p>极速击球捕捉</p></div></div>
+        </div>
+        <div class="tab-content" id="mass">
+            <div class="case-card glass-panel"><div class="case-bg"></div><div class="case-info"><h4>金山半马</h4><p>全域摄影保障</p></div></div>
+            <div class="case-card glass-panel"><div class="case-bg"></div><div class="case-info"><h4>龙舟公开赛</h4><p>团队风采纪实</p></div></div>
+            <div class="case-card glass-panel"><div class="case-bg"></div><div class="case-info"><h4>青训邀请赛</h4><p>家长分享互动</p></div></div>
+        </div>
+        <div class="tab-content" id="gov">
+            <div class="case-card glass-panel"><div class="case-bg"></div><div class="case-info"><h4>上海市运会</h4><p>唯一图片直播商</p></div></div>
+            <div class="case-card glass-panel"><div class="case-bg"></div><div class="case-info"><h4>区体局合作</h4><p>多区官方供应商</p></div></div>
+            <div class="case-card glass-panel"><div class="case-bg"></div><div class="case-info"><h4>上海市民运动会</h4><p>全场景运动保障</p></div></div>
+        </div>
+    </section>
+
+    <footer id="contact" class="gs-reveal">
+        <div class="container">
+            <h2 class="heavy-italic">立即定制您的业务方案&nbsp;</h2>
+            <p style="margin: 20px 0; color: #8b96a5; font-size: 1.1rem;">商务合作：17316432146（同微信）</p>
+            <a href="tel:17316432146" class="btn-skew btn-primary heavy-italic" style="margin-top: 20px;"><span class="unskew">联系我们&nbsp;</span></a>
+        </div>
+        <div class="tech-sig heavy-italic">© 2026 SHANGHAI VERTICAL TECH CO., LTD. | AI 3D ENGINE</div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // 仅在电脑端跟随鼠标移动环境光
+        if(window.innerWidth > 768) {
+            const light = document.querySelector('.ambient-light');
+            document.addEventListener('mousemove', (e) => {
+                gsap.to(light, { x: e.clientX - 250, y: e.clientY - 250, duration: 1 });
+            });
+        }
+
+        const slides = document.querySelectorAll('.slide');
+        let current = 0;
+        setInterval(() => {
+            slides[current].classList.remove('active');
+            current = (current + 1) % slides.length;
+            slides[current].classList.add('active');
+        }, 4500); 
+
+        window.addEventListener('scroll', () => {
+            if(window.scrollY > 50) document.querySelector('.navbar').classList.add('scrolled');
+            else document.querySelector('.navbar').classList.remove('scrolled');
+        });
+
+        // 移动端汉堡菜单逻辑增强 (加入动画类切换)
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const navLinks = document.getElementById('nav-links');
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        function toggleMenu() {
+            menuBtn.classList.toggle('is-active');
+            navLinks.classList.toggle('active');
+            // 阻止背景滚动
+            document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+        }
+        
+        menuBtn.addEventListener('click', toggleMenu);
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if(window.innerWidth <= 768) toggleMenu();
+            });
+        });
+
+        // GSAP 动画 (移动端和PC通用)
+        gsap.from(".hero h1", { y: 40, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out", delay: 0.2 });
+        gsap.from(".hero-subtitle", { y: 30, opacity: 0, duration: 1, ease: "power3.out", delay: 0.6 });
+        gsap.from(".hero-btns", { y: 30, opacity: 0, duration: 1, ease: "power3.out", delay: 0.8 });
+
+        gsap.utils.toArray('.gs-reveal').forEach(elem => {
+            gsap.from(elem, {
+                y: 50, opacity: 0, duration: 0.8, ease: "power3.out",
+                scrollTrigger: { trigger: elem, start: "top 88%", toggleActions: "play none none none" }
+            });
+        });
+
+        document.querySelectorAll(".counter").forEach(counter => {
+            const suffix = counter.getAttribute("data-suffix") || "";
+            ScrollTrigger.create({
+                trigger: counter, start: "top 95%",
+                onEnter: () => {
+                    gsap.fromTo(counter, { innerHTML: 0 }, {
+                        innerHTML: counter.getAttribute("data-target"),
+                        duration: 2, snap: { innerHTML: 1 },
+                        onUpdate: function() { counter.innerHTML = Math.round(this.targets()[0].innerHTML) + suffix + "&nbsp;"; }
+                    });
+                }
+            });
+        });
+
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+                setTimeout(() => ScrollTrigger.refresh(), 100); 
+            });
+        });
+    </script>
+</body>
+</html>
