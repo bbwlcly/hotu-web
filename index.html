@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>垂直科技 | 好兔运动官网 - AI赋能体育摄影</title>
-    <!-- 引入动感体育字体与基础中文字体 -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,900&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
@@ -25,7 +24,6 @@
         body { font-family: 'Noto Sans SC', sans-serif; background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; line-height: 1.6; }
         ::-webkit-scrollbar { display: none; }
 
-        /* 科技感暗纹网格背景 */
         body::before {
             content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
@@ -33,7 +31,6 @@
             background-size: 40px 40px; z-index: -2; pointer-events: none;
         }
 
-        /* 电脑端鼠标跟随环境光 */
         .ambient-light { position: fixed; top: 0; left: 0; width: 50vw; height: 50vw; background: radial-gradient(circle, var(--brand-blue-glow) 0%, rgba(0,0,0,0) 70%); z-index: -1; opacity: 0.4; filter: blur(90px); pointer-events: none; }
 
         /* ================= 2. 基础排版类 ================= */
@@ -62,36 +59,21 @@
         .menu-toggle.is-active span:nth-child(2) { opacity: 0; }
         .menu-toggle.is-active span:nth-child(3) { transform: rotate(-45deg); }
 
-        /* ================= 4. 首屏区 (Hero) ================= */
+        /* ================= 4. 首屏区 (Hero) - Web消隐优化 ================= */
         .hero { position: relative; height: 100vh; min-height: 600px; display: flex; align-items: center; justify-content: flex-start; }
-        
         .hero-bg-slider { 
             position: absolute; inset: 0; z-index: 0; overflow: hidden; 
-            -webkit-mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 200px), transparent 100%);
-            mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 200px), transparent 100%);
+            /* 调整为与手机端一致的百分比消隐 */
+            -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%); 
+            mask-image: linear-gradient(to bottom, black 80%, transparent 100%); 
         }
-        
         .slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transform: scale(1.08); transition: opacity 1.5s ease-in-out, transform 6s linear; }
         .slide.active { opacity: 1; transform: scale(1); }
-        
-        .hero-bg-slider::after {
-            content: ''; position: absolute; inset: 0; z-index: 1; 
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 40%, black 100%);
-            mask-image: linear-gradient(to bottom, transparent 0%, transparent 40%, black 100%);
-            pointer-events: none;
-        }
-
-        .hero-overlay { 
-            position: absolute; inset: 0; 
-            background: linear-gradient(90deg, rgba(3,5,10,0.8) 0%, rgba(3,5,10,0.4) 45%, transparent 100%); 
-            z-index: 1; 
-        }
-
+        .hero-bg-slider::after { content: ''; position: absolute; inset: 0; z-index: 1; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 40%, black 100%); mask-image: linear-gradient(to bottom, transparent 0%, transparent 40%, black 100%); pointer-events: none; }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(3,5,10,0.8) 0%, rgba(3,5,10,0.4) 45%, transparent 100%); z-index: 1; }
         .hero-container { position: relative; z-index: 2; width: 100%; padding-left: var(--hero-left-offset); }
         .hero h1 { font-size: 5rem; line-height: 1.05; text-shadow: 0 10px 30px rgba(0,0,0,0.8); display: block;}
         .hero-subtitle { font-size: 1.2rem; color: #cbd5e1; margin: 40px 0; max-width: 580px; line-height: 1.6; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        
         .hero-btns { display: flex; gap: 20px; justify-content: flex-start; }
         .btn-skew { padding: 16px 40px; text-decoration: none; transform: skewX(-15deg); transition: 0.3s; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; min-width: 180px; position: relative; overflow: hidden; font-size: 1rem;}
         .btn-skew span { transform: skewX(15deg); display: inline-block; }
@@ -103,53 +85,52 @@
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; text-align: center; }
         .stat-item h3 { font-size: 4rem; margin-bottom: 10px; color: var(--brand-blue); }
 
-        .solutions { padding: 80px 0; }
-        .z-row { display: flex; align-items: center; gap: 80px; margin-bottom: 120px; }
-        .z-row:nth-child(even) { flex-direction: row-reverse; }
-        .z-text { flex: 1; }
-        .z-text h3 { font-size: 2.2rem; margin-bottom: 20px; }
-        .z-text p { font-size: 1rem; color: #ccc;}
-        
-        .z-img-placeholder { flex: 1; height: 420px; position: relative; background: transparent; transform-style: preserve-3d; perspective: 1000px; width: 100%; }
-        .z-img-placeholder::before, .z-img-placeholder::after { content: ''; position: absolute; inset: 0; border-radius: 12px; transition: transform 0.6s ease; }
-        .z-img-placeholder::before { border: 2px dashed rgba(0, 229, 255, 0.3); transform: translateZ(-20px) translateX(15px) translateY(15px); }
-        .z-img-placeholder::after { background: linear-gradient(135deg, #111, #222); border: 1px solid var(--brand-blue); display: flex; align-items: center; justify-content: center; content: '等待配图'; color: var(--brand-blue); font-weight: 900; font-style: italic; font-size: 1.2rem;}
-
-        /* --- 商业护城河优化 --- */
-        .moat { padding: 100px 0; background: linear-gradient(180deg, transparent 0%, #0a1120 100%); }
-        .moat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-top: 50px; }
-        .moat-card { 
-            padding: 40px 25px; 
-            text-align: center; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-        }
-        .moat-icon { font-size: 3.2rem; margin-bottom: 20px; display: block; width: 100%; text-align: center; }
-        .moat-card h4 { font-size: 1.3rem; margin-bottom: 12px; width: 100%; }
-        .moat-card p { font-size: 0.95rem; line-height: 1.4; color: #aaa; width: 100%; }
-
-        /* 标杆案例 3:2 比例 */
         .cases { padding: 100px 0; }
         .tab-buttons { display: flex; justify-content: center; gap: 15px; margin-bottom: 50px; flex-wrap: wrap;}
         .tab-btn { background: transparent; color: var(--text-muted); border: none; font-size: 1rem; font-weight: 700; cursor: pointer; padding: 10px 15px; position: relative; white-space: nowrap;}
         .tab-btn.active { color: var(--brand-blue); }
         .tab-btn.active::after { content: ''; position: absolute; bottom: 0; left: 10%; width: 80%; height: 3px; background: var(--brand-blue); transform: skewX(-20deg); }
-        
         .tab-content { display: none; grid-template-columns: repeat(3, 1fr); gap: 30px; }
         .tab-content.active { display: grid; }
-        
-        .case-card { position: relative; aspect-ratio: 3 / 2; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border);}
-        .case-bg { position: absolute; inset: 0; background-size: cover; background-position: center; background-color: #222; transition: transform 0.6s; }
+        .case-card { position: relative; aspect-ratio: 3 / 2; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); }
+        .case-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: 0.6s; }
         .case-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px 20px 20px; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); transform: translateY(20px); transition: 0.4s; }
-        .case-info h4 { font-size: 1.1rem; color: #fff; margin-bottom: 5px; line-height: 1.3;}
-        .case-info p { color: var(--brand-blue); font-size: 0.85rem; }
+        .case-info h4 { font-size: 1.15rem; color: #fff; margin-bottom: 5px; line-height: 1.3; font-weight: 700;}
+        .case-info p { color: var(--brand-blue); font-size: 0.85rem; font-weight: 400; }
+
+        .solutions { padding: 80px 0; }
+        .z-row { display: flex; align-items: center; gap: 80px; margin-bottom: 120px; }
+        .z-row:nth-child(even) { flex-direction: row-reverse; }
+        .z-text { flex: 1; }
+        .z-text h3 { font-size: 2.2rem; margin-bottom: 20px; }
+        .z-text p { font-size: 1.05rem; color: #ccc;}
+        .z-img-placeholder { flex: 1; height: 420px; position: relative; background: transparent; transform-style: preserve-3d; perspective: 1000px; width: 100%; }
+        .z-img-placeholder::before, .z-img-placeholder::after { content: ''; position: absolute; inset: 0; border-radius: 12px; transition: transform 0.6s ease; }
+        .z-img-placeholder::before { border: 2px dashed rgba(0, 229, 255, 0.3); transform: translateZ(-20px) translateX(15px) translateY(15px); pointer-events: none; }
+        .z-img-placeholder::after { background: linear-gradient(135deg, #111, #222); border: 1px solid var(--brand-blue); display: flex; align-items: center; justify-content: center; color: var(--brand-blue); font-weight: 900; font-style: italic; font-size: 1.2rem; z-index: 1;}
+        .z-img-placeholder.has-img::after { background-size: cover; background-position: center; content: ''; }
+
+        #market { padding: 120px 0 60px 0; }
+        #market .moat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 50px; justify-content: center; }
+        #market .moat-card { padding: 40px; text-align: left; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
+        #market .moat-card h4 { 
+            font-size: 1.6rem; 
+            margin-bottom: 15px; 
+            background: linear-gradient(90deg, #fff 0%, var(--brand-blue) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-family: 'Montserrat', sans-serif; font-weight: 900; font-style: italic;
+        }
+
+        .engine-section { padding: 60px 0 120px 0; }
+        .engine-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-top: 50px; }
+        .engine-card { padding: 40px 25px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .engine-icon { font-size: 3.2rem; margin: 0 auto 20px auto; display: block; text-align: center;}
 
         footer { padding: 80px 0 40px; text-align: center; border-top: 1px solid var(--glass-border); }
+        footer .container { display: flex; flex-direction: column; align-items: center; text-align: center; }
         .tech-sig { font-size: 0.8rem; letter-spacing: 2px; color: #555; margin-top: 50px; }
 
-        /* ================= 电脑端专属交互 ================= */
+        /* ================= 交互与适配 ================= */
         @media (hover: hover) and (pointer: fine) {
             .btn-skew:hover { background: #fff; color: #000; transform: skewX(-15deg) translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.4);}
             .z-row:hover .z-img-placeholder::before { transform: translateZ(-40px) translateX(30px) translateY(30px); border-color: var(--brand-blue); }
@@ -157,11 +138,10 @@
             .case-card:hover .case-info { transform: translateY(0); }
         }
 
-        /* ================= 手机端适配优化 (已迭代) ================= */
         @media (max-width: 1024px) { 
             :root { --hero-left-offset: 40px; --side-padding: 20px; } 
             .hero h1 { font-size: 4rem; } 
-            .moat-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid, .engine-grid, #market .moat-grid { grid-template-columns: repeat(2, 1fr); }
         }
         
         @media (max-width: 768px) { 
@@ -169,40 +149,39 @@
             .nav-links { position: fixed; top: 0; right: 0; width: 100%; height: 100vh; background: rgba(3,5,10,0.98); flex-direction: column; justify-content: center; transform: translateX(100%); border-left: none; }
             .nav-links.active { transform: translateX(0); }
 
-            .hero { height: auto; min-height: auto; padding-bottom: 40px; }
+            /* 手机端首屏核心修复：100% 宽度填满，左对齐文字 */
+            .hero { height: auto; min-height: auto; padding-bottom: 40px; flex-direction: column; justify-content: flex-start; align-items: flex-start;}
             .hero-bg-slider { 
-                -webkit-mask-image: linear-gradient(to bottom, black 0%, black 25vw, transparent 75vw);
-                mask-image: linear-gradient(to bottom, black 0%, black 25vw, transparent 75vw);
+                position: relative; width: 100vw; height: 56.25vw; left: 0;
+                -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+                mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
             }
-            .slide { background-size: contain; background-position: top center; background-repeat: no-repeat; }
+            .slide { background-size: cover; background-repeat: no-repeat; background-position: center top; width: 100%; }
             
-            .hero-overlay { background: linear-gradient(to bottom, rgba(3,5,10,0.6) 0%, rgba(3,5,10,0) 40vw); }
-            .hero-container { padding: 0 20px; margin-top: 45vw; } 
+            .hero-overlay { background: linear-gradient(to bottom, rgba(3,5,10,0.4) 0%, rgba(3,5,10,0) 40vw); }
+            .hero-container { padding: 0 30px; margin-top: 25px; text-align: left; width: 100%; }
+            .hero h1 { font-size: 2rem; line-height: 1.2; margin-bottom: 12px; } 
+            .hero-subtitle { font-size: 1rem; margin: 15px 0 25px; line-height: 1.5; }
             
-            .hero h1 { font-size: 1.95rem; line-height: 1.25; margin-bottom: 8px; padding-right: 0.2em !important; } 
-            .hero-subtitle { font-size: 0.95rem; margin: 15px 0 35px; line-height: 1.5; opacity: 0.9; }
-
-            .hero-btns { flex-direction: column; gap: 12px; width: 100%; align-items: center; }
-            .btn-skew { width: 100%; max-width: 240px; transform: skewX(-8deg); padding: 14px 0; font-size: 0.95rem; }
+            .hero-btns { align-items: flex-start; width: 100%; flex-direction: row; flex-wrap: wrap; gap: 10px; }
+            .btn-skew { width: calc(50% - 5px); min-width: auto; transform: skewX(-8deg); padding: 12px 0; font-size: 0.9rem;}
             .btn-skew span { transform: skewX(8deg); } 
 
-            .social-proof { padding: 60px 0 80px 0; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 25px 15px; }
-            .stat-item h3 { font-size: 2.2rem; margin-bottom: 5px; }
-            .stat-item p { font-size: 0.85rem; color: var(--text-muted); }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 0 10px; }
+            .stat-item h3 { font-size: 1.8rem; }
+            .stat-item p { font-size: 0.8rem; }
 
+            .z-text { padding: 0 35px; text-align: left; } 
+            .z-text h3 { font-size: 1.6rem; }
+            .z-img-placeholder { height: 200px; width: calc(100% - 70px); margin: 0 auto; }
+            
             .solutions { padding: 40px 0; }
-            .z-row, .z-row:nth-child(even) { flex-direction: column; gap: 30px; margin-bottom: 80px; text-align: center;}
-            .z-text { padding: 0 25px; }
-            .z-img-placeholder { height: 220px; width: calc(100% - 50px); margin: 0 auto; }
-            
-            /* 手机端护城河卡片强制居中 */
-            .moat-grid { grid-template-columns: 1fr; gap: 20px; }
-            .moat-card { padding: 35px 20px; }
-            .moat-icon { margin-bottom: 15px; }
-            
-            .tab-content { grid-template-columns: 1fr; }
-            .case-info { transform: translateY(0); padding-bottom: 20px; }
+            .z-row, .z-row:nth-child(even) { flex-direction: column; gap: 30px; margin-bottom: 70px; text-align: left;}
+
+            .moat-grid, .tab-content, .engine-grid, #market .moat-grid { grid-template-columns: 1fr; }
+            #market, .engine-section { padding: 50px 35px; }
+            .case-info { transform: translateY(0); padding: 20px; }
+            .case-info h4 { font-size: 1.1rem; }
             .ambient-light { display: none; }
         }
     </style>
@@ -215,13 +194,14 @@
         <div class="logo heavy-italic">HOTU <span>|</span> 垂直科技</div>
         <div class="menu-toggle" id="mobile-menu-btn"><span></span><span></span><span></span></div>
         <div class="nav-links" id="nav-links">
-            <a href="#solutions" class="nav-item">核心方案</a>
-            <a href="#moat" class="nav-item">商业护城河</a>
             <a href="#cases" class="nav-item">标杆案例</a>
+            <a href="#solutions" class="nav-item">数字化产品</a>
+            <a href="#market" class="nav-item">市场逻辑</a>
             <a href="#contact" class="nav-item glass-panel" style="padding: 8px 20px; border-radius: 4px;">联系我们</a>
         </div>
     </nav>
 
+    <!-- 1. 首屏 -->
     <section class="hero">
         <div class="hero-bg-slider" id="slider">
             <div class="slide active" style="background-image: url('images/hero-slide-1.jpg');"></div>
@@ -240,6 +220,7 @@
         </div>
     </section>
 
+    <!-- 2. 数字背后的信赖 -->
     <section class="social-proof">
         <div class="container">
             <div class="center-title-box gs-reveal">
@@ -254,60 +235,7 @@
         </div>
     </section>
 
-    <section class="solutions container" id="solutions">
-        <div class="z-row gs-reveal">
-            <div class="z-text">
-                <h3 class="heavy-italic">AI 2D 转 <span class="gradient-text">3D 建模</span></h3>
-                <p>无需专业扫描设备。基于自研先进算法，将二维赛事照片瞬间转化为可交互的 3D 数字资产，颠覆传统观赛体验。</p>
-            </div>
-            <div class="z-img-placeholder"></div>
-        </div>
-        <div class="z-row gs-reveal">
-            <div class="z-text">
-                <h3 class="heavy-italic">赛事图片与<span class="gradient-text">摄像直播</span></h3>
-                <p>打破传统宣发延迟。7000+ 滴滴式精准约拍摄影师网络，赛事全程实时分发高质量大片。让运动员在完赛第一时间即可分享社交平台。</p>
-            </div>
-            <div class="z-img-placeholder"></div>
-        </div>
-        <div class="z-row gs-reveal">
-            <div class="z-text">
-                <h3 class="heavy-italic">3D <span class="gradient-text">文创产品</span></h3>
-                <p>将数字化记忆降维实体化。基于高精度 3D 建模，直连云端 3D 打印。为体育用户提供专属的情绪价值产品。</p>
-            </div>
-            <div class="z-img-placeholder"></div>
-        </div>
-    </section>
-
-    <section class="moat" id="moat">
-        <div class="container">
-            <div class="center-title-box gs-reveal">
-                <h2 class="heavy-italic section-title">体育商业的<span class="gradient-text">核心引擎</span></h2>
-            </div>
-            <div class="moat-grid">
-                <div class="moat-card glass-panel gs-reveal">
-                    <i class="moat-icon">📷</i>
-                    <h4 class="heavy-italic">摄影师池</h4>
-                    <p>“滴滴式”约拍精准调度</p>
-                </div>
-                <div class="moat-card glass-panel gs-reveal">
-                    <i class="moat-icon">💾</i>
-                    <h4 class="heavy-italic">运动照片池</h4>
-                    <p>千万级高质量图库燃料</p>
-                </div>
-                <div class="moat-card glass-panel gs-reveal">
-                    <i class="moat-icon">🎯</i>
-                    <h4 class="heavy-italic">运动流量池</h4>
-                    <p>赋能品牌精准曝光变现</p>
-                </div>
-                <div class="moat-card glass-panel gs-reveal">
-                    <i class="moat-icon">🏅</i>
-                    <h4 class="heavy-italic">奥运明星运动池</h4>
-                    <p>沉淀顶级明星数字资产</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    <!-- 3. 标杆案例 -->
     <section class="cases container" id="cases">
         <div class="center-title-box gs-reveal">
             <h2 class="heavy-italic section-title">标杆<span class="gradient-text">案例</span></h2>
@@ -321,61 +249,121 @@
         </div>
         
         <div class="tab-content active" id="pro">
-            <div class="case-card gs-reveal">
-                <div class="case-bg" style="background-image: url('images/case-pro-wcba-shanghai.jpg');"></div>
-                <div class="case-info"><h4>WCBA 上海女篮主场</h4><p>官方指定摄影伙伴</p></div>
-            </div>
-            <div class="case-card gs-reveal">
-                <div class="case-bg" style="background-image: url('images/case-pro-cvl-women.jpg');"></div>
-                <div class="case-info"><h4>中国女排超级联赛</h4><p>独家视觉内容供应商</p></div>
-            </div>
-            <div class="case-card gs-reveal">
-                <div class="case-bg" style="background-image: url('images/case-pro-cvl-men.jpg');"></div>
-                <div class="case-info"><h4>中国男排超级联赛</h4><p>赛事全程影像保障</p></div>
-            </div>
+            <div class="case-card gs-reveal"><div class="case-bg" style="background-image: url('images/case-pro-wcba-shanghai.jpg');"></div><div class="case-info"><h4>WCBA 上海女篮主场</h4><p>官方指定摄影伙伴</p></div></div>
+            <div class="case-card gs-reveal"><div class="case-bg" style="background-image: url('images/case-pro-cvl-women.jpg');"></div><div class="case-info"><h4>中国女排超级联赛</h4><p>独家视觉内容供应商</p></div></div>
+            <div class="case-card gs-reveal"><div class="case-bg" style="background-image: url('images/case-pro-cvl-men.jpg');"></div><div class="case-info"><h4>中国男排超级联赛</h4><p>赛事全程影像保障</p></div></div>
         </div>
-
         <div class="tab-content" id="int">
-            <div class="case-card">
-                <div class="case-bg" style="background-image: url('images/case-int-sailing-masters.jpg');"></div>
-                <div class="case-info"><h4>国际帆板大师赛</h4><p>高难度水上视觉记录</p></div>
-            </div>
+            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-int-sailing-masters.jpg');"></div><div class="case-info"><h4>国际帆板大师赛</h4><p>高难度水上视觉记录</p></div></div>
         </div>
-
         <div class="tab-content" id="youth">
-            <div class="case-card">
-                <div class="case-bg" style="background-image: url('images/case-youth-championship.jpg');"></div>
-                <div class="case-info"><h4>上海市青少年体育精英系列赛</h4><p>官方指定图片直播商</p></div>
-            </div>
-            <div class="case-card">
-                <div class="case-bg" style="background-image: url('images/case-youth-champions.jpg');"></div>
-                <div class="case-info"><h4>上海市青少年体育锦标赛</h4><p>精英时刻极速分发</p></div>
-            </div>
-            <div class="case-card">
-                <div class="case-bg" style="background-image: url('images/case-youth-champion.jpg');"></div>
-                <div class="case-info"><h4>上海市青少年体育冠军赛</h4><p>记录青少年竞技巅峰</p></div>
-            </div>
+            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-youth-championship.jpg');"></div><div class="case-info"><h4>上海市青少年体育精英系列赛</h4><p>官方指定图片直播商</p></div></div>
+            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-youth-champions.jpg');"></div><div class="case-info"><h4>上海市青少年体育锦标赛</h4><p>精英时刻极速分发</p></div></div>
+            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-youth-champion.jpg');"></div><div class="case-info"><h4>上海市青少年体育冠军赛</h4><p>记录青少年竞技巅峰时刻</p></div></div>
         </div>
-
         <div class="tab-content" id="mass">
-            <div class="case-card">
-                <div class="case-bg" style="background-image: url('images/case-jinshan-marathon.jpg');"></div>
-                <div class="case-info"><h4>金山半马</h4><p>马拉松全域影像服务</p></div>
+            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-jinshan-marathon.jpg');"></div><div class="case-info"><h4>金山半马</h4><p>马拉松全域影像服务</p></div></div>
+            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-city-amateur.jpg');"></div><div class="case-info"><h4>城市业余联赛</h4><p>群众体育数字化影像服务</p></div></div>
+            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-citizens-games.jpg');"></div><div class="case-info"><h4>上海市民运动会</h4><p>全场景运动保障服务</p></div></div>
+        </div>
+        <div class="tab-content" id="team">
+            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-sh-mint-games.jpg');"></div><div class="case-info"><h4>上海印钞有限公司职工运动会</h4><p>企业文化影像定制服务</p></div></div>
+        </div>
+    </section>
+
+    <!-- 4. 核心业务 -->
+    <section class="solutions container" id="solutions">
+        <div class="z-row gs-reveal">
+            <div class="z-text">
+                <h3 class="heavy-italic">AI 3D <span class="gradient-text">数字化手办</span></h3>
+                <p>将赛场高光瞬间降维实体化。只需单张照片或短视频，即可通过云端 AI 自动建模。为运动员提供满载情绪价值的专属纪念，让运动记忆触手可及。</p>
             </div>
-            <div class="case-card">
-                <div class="case-bg" style="background-image: url('images/case-city-amateur.jpg');"></div>
-                <div class="case-info"><h4>城市业余联赛</h4><p>群众体育数字化影像服务</p></div>
+            <div class="z-img-placeholder has-img" style="background-image: url('images/product-figurine.jpg');"></div>
+        </div>
+        <div class="z-row gs-reveal">
+            <div class="z-text">
+                <h3 class="heavy-italic">赛事图片与<span class="gradient-text">摄像直播</span></h3>
+                <p>打破传统宣发延迟。依托 7000+ 摄影师调度网络，实现赛事全程秒级分发高质量大片。基于高精度拍摄，为后续 AI 建模提供顶级数据源。</p>
             </div>
-            <div class="case-card">
-                <div class="case-bg" style="background-image: url('images/case-citizens-games.jpg');"></div>
-                <div class="case-info"><h4>上海市民运动会</h4><p>全场景运动保障服务</p></div>
+            <div class="z-img-placeholder has-img" style="background-image: url('images/product-live.jpg');"></div>
+        </div>
+    </section>
+
+    <!-- 5. 市场潜力 -->
+    <section class="moat container" id="market">
+        <div class="center-title-box gs-reveal">
+            <h2 class="heavy-italic section-title">三位一体：撬动<span class="gradient-text">万亿体育市场</span></h2>
+        </div>
+        <div class="moat-grid">
+            <div class="moat-card glass-panel gs-reveal">
+                <h4 class="heavy-italic">大众化维度</h4>
+                <p>让专业技术以低成本方式下沉长尾市场，释放万级赛事的商业潜能。</p>
+            </div>
+            <div class="moat-card glass-panel gs-reveal">
+                <h4 class="heavy-italic">增量市场维度</h4>
+                <p>从线性增长转向“数据服务+沉浸体验+虚拟消费”的指数型增长模式。</p>
+            </div>
+            <div class="moat-card glass-panel gs-reveal">
+                <h4 class="heavy-italic">全球化维度</h4>
+                <p>通过数字孪生技术打破物理限制，使体育 IP价值全球连接。</p>
             </div>
         </div>
+    </section>
 
-        <div class="tab-content" id="team">
-            <div class="case-card">
-                <div class="case-bg" style="background-image: url('images/case-sh-mint-games.jpg');"></div>
-                <div class="case-info"><h4>上海印钞有限公司职工运动会</h4><p>企业文化影像定制服务</p></div>
+    <!-- 6. 核心引擎 -->
+    <section class="moat container engine-section">
+        <div class="center-title-box gs-reveal">
+            <h2 class="heavy-italic section-title">体育商业的<span class="gradient-text">核心引擎</span></h2>
+        </div>
+        <div class="engine-grid">
+            <div class="engine-card glass-panel gs-reveal">
+                <i class="engine-icon">📷</i>
+                <h4 class="heavy-italic" style="color:#fff; font-size:1.3rem; margin-bottom:10px;">摄影师池</h4>
+                <p style="color:#aaa;">“滴滴式”约拍精准调度</p>
+            </div>
+            <div class="engine-card glass-panel gs-reveal">
+                <i class="engine-icon">💾</i>
+                <h4 class="heavy-italic" style="color:#fff; font-size:1.3rem; margin-bottom:10px;">照片池</h4>
+                <p style="color:#aaa;">千万级高质量图库燃料</p>
+            </div>
+            <div class="engine-card glass-panel gs-reveal">
+                <i class="engine-icon">🎯</i>
+                <h4 class="heavy-italic" style="color:#fff; font-size:1.3rem; margin-bottom:10px;">流量池</h4>
+                <p style="color:#aaa;">赋能品牌精准曝光变现</p>
+            </div>
+            <div class="engine-card glass-panel gs-reveal">
+                <i class="engine-icon">🏅</i>
+                <h4 class="heavy-italic" style="color:#fff; font-size:1.3rem; margin-bottom:10px;">数字资产池</h4>
+                <p style="color:#aaa;">沉淀顶级明星数字资产</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. 愿景 -->
+    <section class="container gs-reveal" style="padding: 100px 20px;">
+        <div class="center-title-box">
+            <h2 class="heavy-italic section-title">我们的愿景：<span class="gradient-text">重构运动世界</span></h2>
+        </div>
+        <div class="engine-grid">
+            <div class="engine-card glass-panel gs-reveal" style="text-align: left; align-items: flex-start; padding: 30px;">
+                <span class="gradient-text heavy-italic" style="font-size: 2.5rem; display: block; margin-bottom: 10px;">01</span>
+                <h4 class="heavy-italic" style="font-size: 1.3rem; margin-bottom: 10px;">运动爱好者</h4>
+                <p style="font-size: 0.95rem; color: #8b96a5;">提升运动技能，找到最合适的教练，让运动触手及。</p>
+            </div>
+            <div class="engine-card glass-panel gs-reveal" style="text-align: left; align-items: flex-start; padding: 30px;">
+                <span class="gradient-text heavy-italic" style="font-size: 2.5rem; display: block; margin-bottom: 10px;">02</span>
+                <h4 class="heavy-italic" style="font-size: 1.3rem; margin-bottom: 10px;">教练/培训机构</h4>
+                <p style="font-size: 0.95rem; color: #8b96a5;">建立个人技术规范与特点，通过数字化资产实现个人价值。</p>
+            </div>
+            <div class="engine-card glass-panel gs-reveal" style="text-align: left; align-items: flex-start; padding: 30px;">
+                <span class="gradient-text heavy-italic" style="font-size: 2.5rem; display: block; margin-bottom: 10px;">03</span>
+                <h4 class="heavy-italic" style="font-size: 1.3rem; margin-bottom: 10px;">体育赛事</h4>
+                <p style="font-size: 0.95rem; color: #8b96a5;">打破地理与物理限制，通过数字化产品全方位扩大赛事影响力。</p>
+            </div>
+            <div class="engine-card glass-panel gs-reveal" style="text-align: left; align-items: flex-start; padding: 30px;">
+                <span class="gradient-text heavy-italic" style="font-size: 2.5rem; display: block; margin-bottom: 10px;">04</span>
+                <h4 class="heavy-italic" style="font-size: 1.3rem; margin-bottom: 10px;">更多人</h4>
+                <p style="font-size: 0.95rem; color: #8b96a5;">因为数字化带来的新鲜体验，让更多人喜欢、热爱并参与体育运动。</p>
             </div>
         </div>
     </section>
@@ -384,7 +372,7 @@
         <div class="container">
             <h2 class="heavy-italic">立即定制好图直播</h2>
             <p style="margin: 20px 0; color: #8b96a5; font-size: 1.1rem;">商务合作：17316432146（同微信）</p>
-            <a href="tel:17316432146" class="btn-skew btn-primary heavy-italic" style="margin-top: 20px;"><span>联系好兔运动</span></a>
+            <a href="tel:17316432146" class="btn-skew btn-primary heavy-italic" style="margin-top: 10px;"><span>联系好兔运动</span></a>
         </div>
         <div class="tech-sig heavy-italic">© 2026 SHANGHAI VERTICAL TECH CO., LTD. | AI 3D ENGINE</div>
     </footer>
@@ -429,21 +417,11 @@
             item.addEventListener('click', () => { if(window.innerWidth <= 768) toggleMenu(); });
         });
 
-        gsap.from(".hero h1", { y: 40, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out", delay: 0.2 });
-        gsap.from(".hero-subtitle", { y: 30, opacity: 0, duration: 1, ease: "power3.out", delay: 0.6 });
-        gsap.from(".hero-btns", { y: 30, opacity: 0, duration: 1, ease: "power3.out", delay: 0.8 });
-
-        gsap.utils.toArray('.gs-reveal').forEach(elem => {
-            gsap.from(elem, {
-                y: 50, opacity: 0, duration: 0.8, ease: "power3.out",
-                scrollTrigger: { trigger: elem, start: "top 88%", toggleActions: "play none none none" }
-            });
-        });
-
         document.querySelectorAll(".counter").forEach(counter => {
             const suffix = counter.getAttribute("data-suffix") || "";
             ScrollTrigger.create({
-                trigger: counter, start: "top 95%",
+                trigger: counter, 
+                start: "top 95%",
                 onEnter: () => {
                     gsap.fromTo(counter, { innerHTML: 0 }, {
                         innerHTML: counter.getAttribute("data-target"),
@@ -451,6 +429,13 @@
                         onUpdate: function() { counter.innerHTML = Math.round(this.targets()[0].innerHTML) + suffix; }
                     });
                 }
+            });
+        });
+
+        gsap.utils.toArray('.gs-reveal').forEach(elem => {
+            gsap.from(elem, {
+                y: 50, opacity: 0, duration: 0.8, ease: "power3.out",
+                scrollTrigger: { trigger: elem, start: "top 88%", toggleActions: "play none none none" }
             });
         });
 
