@@ -1,12 +1,37 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+  
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>垂直科技 | 好兔运动官网 - AI赋能体育摄影</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,900&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <style>
+    <!-- 注意看！所有的样式代码必须写在下面这个 style 标签里面 👇 -->
+    <style> 
+        
+        /* 修复：强制支撑手机端图片的高度，并优化错位效果 */
+   /* 修复：强制支撑手机端图片的高度，并优化错位效果 */
+        @media (max-width: 768px) {
+            .z-img-placeholder.has-img {
+                display: block !important;
+                
+                /* 👇 修改了这里：宽度减去70px（左右各留35px），和文字完美对齐 */
+                width: calc(100% - 70px) !important;  
+                
+                /* 👇 修改了这里：保证上下有间距，并且左右居中（auto） */
+                margin: 30px auto 0 auto !important;  
+                
+                height: 220px !important;     
+                min-height: 220px !important; 
+                border-radius: 12px;
+            }
+            
+            .z-img-placeholder::before {
+                transform: translateZ(-10px) translateX(10px) translateY(10px) !important;
+            }
+        }
+        /* ... 这里保留你后面的其他所有 CSS 代码 ... */
         /* ================= 1. 核心变量 ================= */
         :root {
             --bg-color: #03050a; 
@@ -81,6 +106,21 @@
         .btn-outline { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; backdrop-filter: blur(10px); }
 
         /* ================= 5. 内容区块 ================= */
+        /* 新增：视频展示区样式 */
+        .video-section { padding: 100px 0; }
+        .video-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; margin-top: 40px; }
+        .video-card { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); background: var(--glass-bg); padding: 10px; }
+        .video-wrapper { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; }
+        .video-wrapper video { width: 100%; height: 100%; object-fit: cover; }
+        .video-info-bar { padding: 20px 10px 10px; display: flex; justify-content: space-between; align-items: center;}
+        .video-info-bar h4 { font-size: 1.2rem; margin: 0; }
+        .video-badge { font-size: 0.75rem; color: #000; background: var(--brand-blue); padding: 3px 10px; border-radius: 20px; font-weight: 700; }
+        
+        /* 适配手机端 */
+        @media (max-width: 768px) {
+            .video-section { padding: 60px 0; }
+            .video-grid { grid-template-columns: 1fr; gap: 30px; }
+        }
         .social-proof { padding: 80px 0 120px 0; }
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; text-align: center; }
         .stat-item h3 { font-size: 4rem; margin-bottom: 10px; color: var(--brand-blue); }
@@ -104,11 +144,14 @@
         .z-text { flex: 1; }
         .z-text h3 { font-size: 2.2rem; margin-bottom: 20px; }
         .z-text p { font-size: 1.05rem; color: #ccc;}
-        .z-img-placeholder { flex: 1; height: 420px; position: relative; background: transparent; transform-style: preserve-3d; perspective: 1000px; width: 100%; }
+       .z-img-placeholder { flex: 1; height: 420px; position: relative; background: transparent; transform-style: preserve-3d; perspective: 1000px; width: 100%; border-radius: 12px; }
         .z-img-placeholder::before, .z-img-placeholder::after { content: ''; position: absolute; inset: 0; border-radius: 12px; transition: transform 0.6s ease; }
         .z-img-placeholder::before { border: 2px dashed rgba(0, 229, 255, 0.3); transform: translateZ(-20px) translateX(15px) translateY(15px); pointer-events: none; }
         .z-img-placeholder::after { background: linear-gradient(135deg, #111, #222); border: 1px solid var(--brand-blue); display: flex; align-items: center; justify-content: center; color: var(--brand-blue); font-weight: 900; font-style: italic; font-size: 1.2rem; z-index: 1;}
-        .z-img-placeholder.has-img::after { background-size: cover; background-position: center; content: ''; }
+       /* 修复：让容器本身适应图片大小 */
+.z-img-placeholder.has-img { background-size: cover; background-position: center; }
+/* 修复：将黑色渐变遮罩变透明，露出下面的图片，同时保留蓝色边框 */
+.z-img-placeholder.has-img::after { background: transparent; content: ''; }
 
         #market { padding: 120px 0 60px 0; }
         #market .moat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 50px; justify-content: center; }
@@ -184,6 +227,7 @@
             .case-info h4 { font-size: 1.1rem; }
             .ambient-light { display: none; }
         }
+            
     </style>
 </head>
 <body>
@@ -194,6 +238,7 @@
         <div class="logo heavy-italic">HOTU <span>|</span> 垂直科技</div>
         <div class="menu-toggle" id="mobile-menu-btn"><span></span><span></span><span></span></div>
         <div class="nav-links" id="nav-links">
+            <a href="#ai-3d" class="nav-item">AI 3D引擎</a>
             <a href="#cases" class="nav-item">标杆案例</a>
             <a href="#solutions" class="nav-item">数字化产品</a>
             <a href="#market" class="nav-item">市场逻辑</a>
@@ -222,9 +267,11 @@
 
     <!-- 2. 数字背后的信赖 -->
     <section class="social-proof">
-        <div class="container">
+<div class="container">
             <div class="center-title-box gs-reveal">
                 <h2 class="heavy-italic section-title">数字背后的<span class="gradient-text">信赖</span></h2>
+                <!-- 新增的灰色小字 👇 -->
+                <p style="color: var(--text-muted); margin-top: 0px; font-size: 0.95rem; letter-spacing: 2px;">* 截至 2025 年</p>
             </div>
             <div class="stats-grid gs-reveal">
                 <div class="stat-item"><h3 class="heavy-italic counter" data-target="1000" data-suffix="+">0</h3><p>年度服务场次</p></div>
@@ -235,6 +282,48 @@
         </div>
     </section>
 
+<!-- ================= 新增：AI 3D 视频展示 ================= -->
+    <section class="video-section container" id="ai-3d">
+        <div class="center-title-box gs-reveal">
+            <h2 class="heavy-italic section-title">AI 3D <span class="gradient-text">核心引擎</span></h2>
+            <p style="color: var(--text-muted); margin-top: 15px; font-size: 1.1rem;">无需穿戴动捕设备，通过云端算法将 2D 视频极速转化为 3D 高精度动态资产。</p>
+        </div>
+        
+        <div class="video-grid">
+            <!-- 视频 1 -->
+            <div class="video-card gs-reveal">
+                <div class="video-wrapper">
+                    <!-- controls: 显示控制条 / poster: 封面图 / preload: 预加载信息 -->
+                    <video src="videos/video-1.mp4" 
+                           controls 
+                           poster="images/video-cover-1.jpg" 
+                           preload="metadata" 
+                           playsinline>
+                    </video>
+                </div>
+                <div class="video-info-bar">
+                    <h4 class="heavy-italic">AI教练</h4>
+                    <span class="video-badge heavy-italic">AI RENDER</span>
+                </div>
+            </div>
+
+            <!-- 视频 2 -->
+            <div class="video-card gs-reveal">
+                <div class="video-wrapper">
+                    <video src="videos/video-2.mp4" 
+                           controls 
+                           poster="images/video-cover-2.jpg" 
+                           preload="metadata" 
+                           playsinline>
+                    </video>
+                </div>
+                <div class="video-info-bar">
+                    <h4 class="heavy-italic">AI萌图</h4>
+                    <span class="video-badge heavy-italic">3D ASSETS</span>
+                </div>
+            </div>
+        </div>
+    </section>  
     <!-- 3. 标杆案例 -->
     <section class="cases container" id="cases">
         <div class="center-title-box gs-reveal">
@@ -275,8 +364,8 @@
     <section class="solutions container" id="solutions">
         <div class="z-row gs-reveal">
             <div class="z-text">
-                <h3 class="heavy-italic">AI 3D <span class="gradient-text">数字化手办</span></h3>
-                <p>将赛场高光瞬间降维实体化。只需单张照片或短视频，即可通过云端 AI 自动建模。为运动员提供满载情绪价值的专属纪念，让运动记忆触手可及。</p>
+                <h3 class="heavy-italic">AI <span class="gradient-text">文创产品</span></h3>
+                <p>突破虚拟与现实的边界。只需一张照片，即可通过云端 AI 极速建模，为您专属定制 3D 实体手办、精美浮雕与玻璃艺术品。让每一份珍贵的记忆，转化为触手可及的温度与感动。</p>
             </div>
             <div class="z-img-placeholder has-img" style="background-image: url('images/product-figurine.jpg');"></div>
         </div>
@@ -285,7 +374,7 @@
                 <h3 class="heavy-italic">赛事图片与<span class="gradient-text">摄像直播</span></h3>
                 <p>打破传统宣发延迟。依托 7000+ 摄影师调度网络，实现赛事全程秒级分发高质量大片。基于高精度拍摄，为后续 AI 建模提供顶级数据源。</p>
             </div>
-            <div class="z-img-placeholder has-img" style="background-image: url('images/product-live.jpg');"></div>
+            <div class="z-img-placeholder has-img" style="background-image: url('images/product-event-live.jpg');"></div>
         </div>
     </section>
 
