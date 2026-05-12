@@ -68,6 +68,41 @@
         .center-title-box { text-align: center; width: 100%; margin-bottom: 50px; }
         .gs-reveal { will-change: transform, opacity; }
 
+        /* ================= 媒体预加载（图片/视频） ================= */
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        /* 快网速：不闪骨架；慢网速（超过阈值才加 .is-loading）才显示流光占位 */
+        .lazy-media {
+            position: relative;
+            background-color: rgba(255,255,255,0.02);
+            overflow: hidden;
+        }
+        .lazy-media.is-loading::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.11), rgba(255,255,255,0.04));
+            transform: translateX(-100%);
+            animation: shimmer 1.2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .lazy-media.is-loading::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(0,229,255,0.10), rgba(0,0,0,0) 60%);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        .lazy-media.is-loaded.is-loading::before,
+        .lazy-media.is-loaded.is-loading::after {
+            opacity: 0;
+            animation: none;
+            transition: opacity 0.25s ease;
+        }
+
         /* ================= 3. 导航栏 ================= */
         .navbar { position: fixed; top: 0; left: 0; width: 100%; padding: 25px var(--side-padding); z-index: 999; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
         .navbar.scrolled { background: rgba(3, 5, 10, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); padding: 15px var(--side-padding); }
@@ -111,7 +146,36 @@
         .video-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; margin-top: 40px; }
         .video-card { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); background: var(--glass-bg); padding: 10px; }
         .video-wrapper { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; }
-        .video-wrapper video { width: 100%; height: 100%; object-fit: cover; }
+        .video-wrapper video { width: 100%; height: 100%; object-fit: contain; }
+        .video-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.75));
+            color: rgba(255,255,255,0.9);
+            z-index: 2;
+            pointer-events: none;
+        }
+        .video-loading .spinner {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            border: 3px solid rgba(255,255,255,0.25);
+            border-top-color: var(--brand-blue);
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .video-wrapper.is-ready .video-loading {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.2s ease, visibility 0.2s;
+        }
+
         .video-info-bar { padding: 20px 10px 10px; display: flex; justify-content: space-between; align-items: center;}
         .video-info-bar h4 { font-size: 1.2rem; margin: 0; }
         .video-badge { font-size: 0.75rem; color: #000; background: var(--brand-blue); padding: 3px 10px; border-radius: 20px; font-weight: 700; }
@@ -148,9 +212,21 @@
         .z-img-placeholder::before, .z-img-placeholder::after { content: ''; position: absolute; inset: 0; border-radius: 12px; transition: transform 0.6s ease; }
         .z-img-placeholder::before { border: 2px dashed rgba(0, 229, 255, 0.3); transform: translateZ(-20px) translateX(15px) translateY(15px); pointer-events: none; }
         .z-img-placeholder::after { background: linear-gradient(135deg, #111, #222); border: 1px solid var(--brand-blue); display: flex; align-items: center; justify-content: center; color: var(--brand-blue); font-weight: 900; font-style: italic; font-size: 1.2rem; z-index: 1;}
+        /* 图片单独一层叠在装饰框之上，避免虚线/描边压在人物上 */
+        .z-img-placeholder .z-img-surface {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            box-shadow: inset 0 0 0 1px rgba(0, 229, 255, 0.35);
+        }
        /* 修复：让容器本身适应图片大小 */
-.z-img-placeholder.has-img { background-size: cover; background-position: center; }
-/* 修复：将黑色渐变遮罩变透明，露出下面的图片，同时保留蓝色边框 */
+.z-img-placeholder.has-img { background: none; }
+.z-img-placeholder.has-img::before,
+.z-img-placeholder.has-img::after { z-index: 0; }
+/* 修复：将黑色渐变遮罩变透明，露出下面的图片，同时保留蓝色边框（由下层 ::after 与上层 inset 阴影共同呈现层次） */
 .z-img-placeholder.has-img::after { background: transparent; content: ''; }
 
         #market { padding: 120px 0 60px 0; }
@@ -249,9 +325,9 @@
     <!-- 1. 首屏 -->
     <section class="hero">
         <div class="hero-bg-slider" id="slider">
-            <div class="slide active" style="background-image: url('images/hero-slide-1.jpg');"></div>
-            <div class="slide" style="background-image: url('images/hero-slide-2.jpg');"></div>
-            <div class="slide" style="background-image: url('images/hero-slide-3.jpg');"></div>
+            <div class="slide lazy-media active" data-bg="images/hero-slide-1.jpg"></div>
+            <div class="slide lazy-media" data-bg="images/hero-slide-2.jpg"></div>
+            <div class="slide lazy-media" data-bg="images/hero-slide-3.jpg"></div>
         </div>
         <div class="hero-overlay"></div>
         <div class="hero-container">
@@ -292,33 +368,40 @@
         <div class="video-grid">
             <!-- 视频 1（左侧）：AI 萌图 -->
             <div class="video-card gs-reveal">
-                <div class="video-wrapper">
+                <div class="video-wrapper is-ready">
                     <!-- controls: 显示控制条 / poster: 封面图 / preload: 预加载信息 -->
-                    <video src="videos/video-2.mp4" 
+                    <video src="videos/video-2-new.mp4" 
                            controls 
-                           poster="images/video-cover-2.jpg" 
-                           preload="metadata" 
+                           preload="auto" 
                            playsinline>
                     </video>
+                    <div class="video-loading" aria-hidden="true">
+                        <div class="spinner"></div>
+                        <div style="font-size: 0.95rem; letter-spacing: 1px;">加载中…</div>
+                    </div>
                 </div>
                 <div class="video-info-bar">
-                    <h4 class="heavy-italic">AI萌图</h4>
+                    <h4 class="heavy-italic">AI动态建模</h4>
                     <span class="video-badge heavy-italic">3D ASSETS</span>
                 </div>
             </div>
 
             <!-- 视频 2（右侧）：AI 教练 -->
             <div class="video-card gs-reveal">
-                <div class="video-wrapper">
+                <div class="video-wrapper is-ready">
                     <video src="videos/video-1.mp4" 
                            controls 
                            poster="images/video-cover-1.jpg" 
                            preload="metadata" 
                            playsinline>
                     </video>
+                    <div class="video-loading" aria-hidden="true">
+                        <div class="spinner"></div>
+                        <div style="font-size: 0.95rem; letter-spacing: 1px;">加载中…</div>
+                    </div>
                 </div>
                 <div class="video-info-bar">
-                    <h4 class="heavy-italic">AI教练</h4>
+                    <h4 class="heavy-italic">AI动态矫正</h4>
                     <span class="video-badge heavy-italic">AI RENDER</span>
                 </div>
             </div>
@@ -338,25 +421,25 @@
         </div>
         
         <div class="tab-content active" id="pro">
-            <div class="case-card gs-reveal"><div class="case-bg" style="background-image: url('images/case-pro-wcba-shanghai.jpg');"></div><div class="case-info"><h4>WCBA 上海女篮主场</h4><p>官方指定摄影伙伴</p></div></div>
-            <div class="case-card gs-reveal"><div class="case-bg" style="background-image: url('images/case-pro-cvl-women.jpg');"></div><div class="case-info"><h4>中国女排超级联赛</h4><p>独家视觉内容供应商</p></div></div>
-            <div class="case-card gs-reveal"><div class="case-bg" style="background-image: url('images/case-pro-cvl-men.jpg');"></div><div class="case-info"><h4>中国男排超级联赛</h4><p>赛事全程影像保障</p></div></div>
+            <div class="case-card gs-reveal"><div class="case-bg lazy-media" data-bg="images/case-pro-wcba-shanghai.jpg"></div><div class="case-info"><h4>WCBA 上海女篮主场</h4><p>官方指定摄影伙伴</p></div></div>
+            <div class="case-card gs-reveal"><div class="case-bg lazy-media" data-bg="images/case-pro-cvl-women.jpg"></div><div class="case-info"><h4>中国女排超级联赛</h4><p>独家视觉内容供应商</p></div></div>
+            <div class="case-card gs-reveal"><div class="case-bg lazy-media" data-bg="images/case-pro-cvl-men.jpg"></div><div class="case-info"><h4>中国男排超级联赛</h4><p>赛事全程影像保障</p></div></div>
         </div>
         <div class="tab-content" id="int">
-            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-int-sailing-masters.jpg');"></div><div class="case-info"><h4>国际帆板大师赛</h4><p>高难度水上视觉记录</p></div></div>
+            <div class="case-card"><div class="case-bg lazy-media" data-bg="images/case-int-sailing-masters.jpg"></div><div class="case-info"><h4>国际帆板大师赛</h4><p>高难度水上视觉记录</p></div></div>
         </div>
         <div class="tab-content" id="youth">
-            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-youth-championship.jpg');"></div><div class="case-info"><h4>上海市青少年体育精英系列赛</h4><p>官方指定图片直播商</p></div></div>
-            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-youth-champions.jpg');"></div><div class="case-info"><h4>上海市青少年体育锦标赛</h4><p>精英时刻极速分发</p></div></div>
-            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-youth-champion.jpg');"></div><div class="case-info"><h4>上海市青少年体育冠军赛</h4><p>记录青少年竞技巅峰时刻</p></div></div>
+            <div class="case-card"><div class="case-bg lazy-media" data-bg="images/case-youth-championship.jpg"></div><div class="case-info"><h4>上海市青少年体育精英系列赛</h4><p>官方指定图片直播商</p></div></div>
+            <div class="case-card"><div class="case-bg lazy-media" data-bg="images/case-youth-champions.jpg"></div><div class="case-info"><h4>上海市青少年体育锦标赛</h4><p>精英时刻极速分发</p></div></div>
+            <div class="case-card"><div class="case-bg lazy-media" data-bg="images/case-youth-champion.jpg"></div><div class="case-info"><h4>上海市青少年体育冠军赛</h4><p>记录青少年竞技巅峰时刻</p></div></div>
         </div>
         <div class="tab-content" id="mass">
-            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-jinshan-marathon.jpg');"></div><div class="case-info"><h4>金山半马</h4><p>马拉松全域影像服务</p></div></div>
-            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-city-amateur.jpg');"></div><div class="case-info"><h4>城市业余联赛</h4><p>群众体育数字化影像服务</p></div></div>
-            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-citizens-games.jpg');"></div><div class="case-info"><h4>上海市民运动会</h4><p>全场景运动保障服务</p></div></div>
+            <div class="case-card"><div class="case-bg lazy-media" data-bg="images/case-jinshan-marathon.jpg"></div><div class="case-info"><h4>金山半马</h4><p>马拉松全域影像服务</p></div></div>
+            <div class="case-card"><div class="case-bg lazy-media" data-bg="images/case-city-amateur.jpg"></div><div class="case-info"><h4>城市业余联赛</h4><p>群众体育数字化影像服务</p></div></div>
+            <div class="case-card"><div class="case-bg lazy-media" data-bg="images/case-citizens-games.jpg"></div><div class="case-info"><h4>上海市民运动会</h4><p>全场景运动保障服务</p></div></div>
         </div>
         <div class="tab-content" id="team">
-            <div class="case-card"><div class="case-bg" style="background-image: url('images/case-sh-mint-games.jpg');"></div><div class="case-info"><h4>上海印钞有限公司职工运动会</h4><p>企业文化影像定制服务</p></div></div>
+            <div class="case-card"><div class="case-bg lazy-media" data-bg="images/case-sh-mint-games.jpg"></div><div class="case-info"><h4>上海印钞有限公司职工运动会</h4><p>企业文化影像定制服务</p></div></div>
         </div>
     </section>
 
@@ -367,14 +450,18 @@
                 <h3 class="heavy-italic">AI <span class="gradient-text">文创产品</span></h3>
                 <p>突破虚拟与现实的边界。只需一张照片，即可通过云端 AI 极速建模，为您专属定制 3D 实体手办、精美浮雕与玻璃艺术品。让每一份珍贵的记忆，转化为触手可及的温度与感动。</p>
             </div>
-            <div class="z-img-placeholder has-img" style="background-image: url('images/product-figurine.jpg');"></div>
+            <div class="z-img-placeholder has-img">
+                <div class="z-img-surface lazy-media" data-bg="images/product-figurine.jpg"></div>
+            </div>
         </div>
         <div class="z-row gs-reveal">
             <div class="z-text">
                 <h3 class="heavy-italic">赛事图片与<span class="gradient-text">摄像直播</span></h3>
                 <p>打破传统宣发延迟。依托 7000+ 摄影师调度网络，实现赛事全程秒级分发高质量大片。基于高精度拍摄，为后续 AI 建模提供顶级数据源。</p>
             </div>
-            <div class="z-img-placeholder has-img" style="background-image: url('images/product-event-live.jpg');"></div>
+            <div class="z-img-placeholder has-img">
+                <div class="z-img-surface lazy-media" data-bg="images/product-event-live.jpg"></div>
+            </div>
         </div>
     </section>
 
@@ -538,6 +625,110 @@
                 document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
                 setTimeout(() => ScrollTrigger.refresh(), 100); 
             });
+        });
+
+        /* ================= 媒体预加载：背景图 lazy-load + 视频 loading ================= */
+        const MEDIA_SLOW_MS = 400;
+
+        function loadBg(el) {
+            const url = el?.dataset?.bg;
+            if (!url || el.dataset.bgLoaded === '1') return;
+            el.dataset.bgLoaded = '1';
+
+            let slowTimer = setTimeout(() => {
+                slowTimer = null;
+                el.classList.add('is-loading');
+            }, MEDIA_SLOW_MS);
+
+            const finish = () => {
+                if (slowTimer) {
+                    clearTimeout(slowTimer);
+                    slowTimer = null;
+                }
+                el.classList.remove('is-loading');
+                el.classList.add('is-loaded');
+            };
+
+            const img = new Image();
+            img.onload = () => {
+                el.style.backgroundImage = `url('${url}')`;
+                finish();
+            };
+            img.onerror = () => {
+                finish();
+            };
+            img.src = url;
+        }
+
+        // 首屏轮播：先加载当前 active，其他稍后再预取（更容易看到骨架效果）
+        const slideEls = Array.from(document.querySelectorAll('.slide[data-bg]'));
+        const activeSlide = slideEls.find(el => el.classList.contains('active'));
+        if (activeSlide) loadBg(activeSlide);
+        // 其余 slide 延迟预取，避免“骨架完全看不到”
+        setTimeout(() => slideEls.filter(el => el !== activeSlide).forEach(loadBg), 600);
+
+        // 其它背景图：接近/进入视口时再加载（骨架更明显）
+        const bgTargets = document.querySelectorAll('[data-bg]:not(.slide)');
+        if ('IntersectionObserver' in window) {
+            const io = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    loadBg(entry.target);
+                    obs.unobserve(entry.target);
+                });
+            }, { root: null, rootMargin: '0px 0px', threshold: 0.01 });
+            bgTargets.forEach(el => io.observe(el));
+        } else {
+            bgTargets.forEach(loadBg);
+        }
+
+        // 视频：快网速/缓存不闪遮罩；首帧慢于阈值再显示；播放中卡顿立即提示
+        document.querySelectorAll('.video-wrapper').forEach(wrapper => {
+            const video = wrapper.querySelector('video');
+            if (!video) return;
+
+            let slowTimer = null;
+
+            const hideOverlay = () => {
+                if (slowTimer) {
+                    clearTimeout(slowTimer);
+                    slowTimer = null;
+                }
+                wrapper.classList.add('is-ready');
+            };
+
+            const showOverlay = () => {
+                if (slowTimer) {
+                    clearTimeout(slowTimer);
+                    slowTimer = null;
+                }
+                wrapper.classList.remove('is-ready');
+            };
+
+            const scheduleSlowOverlay = () => {
+                if (slowTimer) clearTimeout(slowTimer);
+                slowTimer = setTimeout(() => {
+                    slowTimer = null;
+                    wrapper.classList.remove('is-ready');
+                }, MEDIA_SLOW_MS);
+            };
+
+            video.addEventListener('loadstart', () => {
+                if (video.readyState < 3) scheduleSlowOverlay();
+            });
+
+            video.addEventListener('loadeddata', () => {
+                if (video.readyState >= 3) hideOverlay();
+            });
+
+            video.addEventListener('canplay', hideOverlay);
+            video.addEventListener('playing', hideOverlay);
+            video.addEventListener('error', hideOverlay);
+
+            video.addEventListener('waiting', showOverlay);
+            video.addEventListener('stalled', showOverlay);
+
+            if (video.readyState >= 3) hideOverlay();
         });
     </script>
 </body>
