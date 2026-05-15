@@ -145,8 +145,28 @@
         .video-section { padding: 100px 0; }
         .video-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; margin-top: 40px; }
         .video-card { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); background: var(--glass-bg); padding: 10px; }
-        .video-wrapper { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; }
-        .video-wrapper video { width: 100%; height: 100%; object-fit: contain; }
+        .video-wrapper { position: relative; width: 100%; aspect-ratio: 9 / 16; border-radius: 8px; overflow: hidden; background: #000; }
+        .video-wrapper video { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 3; pointer-events: auto; }
+        .flow-arrow {
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            border: 1px solid var(--brand-blue);
+            color: var(--brand-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px auto;
+            font-size: 20px;
+            font-weight: 900;
+        }
+        .flow-arrow::before {
+            content: '→';
+            line-height: 1;
+        }
+        .flow-arrow::after {
+            content: none;
+        }
         .video-loading {
             position: absolute;
             inset: 0;
@@ -157,7 +177,7 @@
             gap: 10px;
             background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.75));
             color: rgba(255,255,255,0.9);
-            z-index: 2;
+            z-index: 1;
             pointer-events: none;
         }
         .video-loading .spinner {
@@ -174,6 +194,9 @@
             visibility: hidden;
             pointer-events: none;
             transition: opacity 0.2s ease, visibility 0.2s;
+        }
+        .video-wrapper.is-ready video {
+            pointer-events: auto;
         }
 
         .video-info-bar { padding: 20px 10px 10px; display: flex; justify-content: space-between; align-items: center;}
@@ -209,9 +232,12 @@
         .z-text h3 { font-size: 2.2rem; margin-bottom: 20px; }
         .z-text p { font-size: 1.05rem; color: #ccc;}
        .z-img-placeholder { flex: 1; height: 420px; position: relative; background: transparent; transform-style: preserve-3d; perspective: 1000px; width: 100%; border-radius: 12px; }
+        .z-img-placeholder .z-row-grid { display: grid; grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr); }
         .z-img-placeholder::before, .z-img-placeholder::after { content: ''; position: absolute; inset: 0; border-radius: 12px; transition: transform 0.6s ease; }
         .z-img-placeholder::before { border: 2px dashed rgba(0, 229, 255, 0.3); transform: translateZ(-20px) translateX(15px) translateY(15px); pointer-events: none; }
         .z-img-placeholder::after { background: linear-gradient(135deg, #111, #222); border: 1px solid var(--brand-blue); display: flex; align-items: center; justify-content: center; color: var(--brand-blue); font-weight: 900; font-style: italic; font-size: 1.2rem; z-index: 1;}
+        .z-img-placeholder.has-img::before { display: none; }
+        .z-img-placeholder.has-img::after { border: none; }
         /* 图片单独一层叠在装饰框之上，避免虚线/描边压在人物上 */
         .z-img-placeholder .z-img-surface {
             position: absolute;
@@ -228,6 +254,7 @@
 .z-img-placeholder.has-img::after { z-index: 0; }
 /* 修复：将黑色渐变遮罩变透明，露出下面的图片，同时保留蓝色边框（由下层 ::after 与上层 inset 阴影共同呈现层次） */
 .z-img-placeholder.has-img::after { background: transparent; content: ''; }
+.z-img-placeholder.has-img .z-img-surface { box-shadow: none; }
 
         #market { padding: 120px 0 60px 0; }
         #market .moat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 50px; justify-content: center; }
@@ -267,6 +294,21 @@
             .menu-toggle { display: flex; }
             .nav-links { position: fixed; top: 0; right: 0; width: 100%; height: 100vh; background: rgba(3,5,10,0.98); flex-direction: column; justify-content: center; transform: translateX(100%); border-left: none; }
             .nav-links.active { transform: translateX(0); }
+            .flow-arrow {
+                width: 44px !important;
+                height: 44px !important;
+            }
+            .flow-arrow::before {
+                content: '↓';
+                font-size: 20px;
+                line-height: 1;
+            }
+            .flow-arrow::after {
+                content: none;
+            }
+
+            /* 手机端首屏核心修复：100% 宽度填满，左对齐文字 */
+            .hero { height: auto; min-height: auto; padding-bottom: 40px; flex-direction: column; justify-content: flex-start; align-items: flex-start;}
 
             /* 手机端首屏核心修复：100% 宽度填满，左对齐文字 */
             .hero { height: auto; min-height: auto; padding-bottom: 40px; flex-direction: column; justify-content: flex-start; align-items: flex-start;}
@@ -293,7 +335,48 @@
             .z-text { padding: 0 35px; text-align: left; } 
             .z-text h3 { font-size: 1.6rem; }
             .z-img-placeholder { height: 200px; width: calc(100% - 70px); margin: 0 auto; }
-            
+
+            /* AI 3D 核心引擎：手机端改成上下结构 */
+            #ai-3d .z-row,
+            #ai-3d .z-row:nth-child(even) {
+                flex-direction: column;
+                gap: 22px;
+                margin-bottom: 50px;
+                align-items: stretch;
+            }
+            #ai-3d .z-text {
+                max-width: none !important;
+                flex: 0 0 auto !important;
+                padding: 0 35px;
+                text-align: left;
+            }
+            #ai-3d .z-text p {
+                max-width: none !important;
+            }
+            #ai-3d .z-img-placeholder {
+                width: calc(100% - 30px) !important;
+                min-height: 0;
+                height: auto !important;
+                padding: 14px !important;
+                margin: 0 auto !important;
+            }
+            #ai-3d .z-img-placeholder::before {
+                display: none !important;
+            }
+            #ai-3d .z-img-placeholder > div {
+                grid-template-columns: 1fr !important;
+                gap: 14px !important;
+            }
+            #ai-3d .z-img-placeholder .glass-panel {
+                min-height: 72px !important;
+            }
+            #ai-3d .z-img-placeholder .video-card {
+                width: 100%;
+            }
+            #ai-3d .z-img-placeholder .video-wrapper {
+                aspect-ratio: 9 / 16;
+            }
+
             .solutions { padding: 40px 0; }
             .z-row, .z-row:nth-child(even) { flex-direction: column; gap: 30px; margin-bottom: 70px; text-align: left;}
 
@@ -358,51 +441,78 @@
         </div>
     </section>
 
-<!-- ================= 新增：AI 3D 视频展示 ================= -->
+<!-- ================= 新增：AI 3D 核心引擎 ================= -->
     <section class="video-section container" id="ai-3d">
         <div class="center-title-box gs-reveal">
             <h2 class="heavy-italic section-title">AI 3D <span class="gradient-text">核心引擎</span></h2>
             <p style="color: var(--text-muted); margin-top: 15px; font-size: 1.1rem;">无需穿戴动捕设备，通过云端算法将 2D 视频极速转化为 3D 高精度动态资产。</p>
         </div>
-        
-        <div class="video-grid">
-            <!-- 视频 1（左侧）：AI 萌图 -->
-            <div class="video-card gs-reveal">
-                <div class="video-wrapper is-ready">
-                    <!-- controls: 显示控制条 / poster: 封面图 / preload: 预加载信息 -->
-                    <video src="videos/video-2-new.mp4" 
-                           controls 
-                           preload="auto" 
-                           playsinline>
-                    </video>
-                    <div class="video-loading" aria-hidden="true">
-                        <div class="spinner"></div>
-                        <div style="font-size: 0.95rem; letter-spacing: 1px;">加载中…</div>
+
+        <div class="z-row gs-reveal" style="margin-bottom: 70px;">
+            <div class="z-text" style="max-width: 250px; flex: 0 0 250px;">
+                <h3 class="heavy-italic">AI <span class="gradient-text">图片建模</span></h3>
+                <p style="max-width: 220px;">一张图片作为输入，经由生成流程输出两个竖版视频结果，用于展示建模效果、结果差异和多版本输出能力。</p>
+            </div>
+            <div class="z-img-placeholder has-img" style="height: auto; min-height: 420px; padding: 18px; flex: 1.55;">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr); gap: 14px; align-items: stretch; width: 100%; height: 100%;">
+                    <div class="video-card" style="padding: 0; border-radius: 12px;">
+                        <div class="video-wrapper" style="aspect-ratio: 9 / 16;">
+                            <img src="images/ai-image-model-input.jpg" alt="AI图片建模输入图" style="width:100%; height:100%; object-fit:cover; display:block;" />
+                        </div>
+                        <div class="video-info-bar"><h4 class="heavy-italic">输入图片</h4><span class="video-badge heavy-italic">IMAGE</span></div>
                     </div>
-                </div>
-                <div class="video-info-bar">
-                    <h4 class="heavy-italic">AI动态建模</h4>
-                    <span class="video-badge heavy-italic">3D ASSETS</span>
+                    <div class="glass-panel" style="display:flex; align-items:center; justify-content:center; min-height: 250px; border-radius: 12px;">
+                        <div style="text-align:center;">
+                            <div class="flow-arrow" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--brand-blue); color: var(--brand-blue); display:flex; align-items:center; justify-content:center; margin: 0 auto 10px auto; font-size: 20px; font-weight: 900;"></div>
+                            <div class="heavy-italic" style="font-size: 1rem;">生成</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:14px;">
+                        <div class="video-card" style="padding: 0; border-radius: 12px;">
+                            <div class="video-wrapper is-ready" style="aspect-ratio: 9 / 16;">
+                                <video src="videos/ai-image-model-output-a.mp4" controls preload="metadata" playsinline muted></video>
+                                <div class="video-loading" aria-hidden="true"><div class="spinner"></div><div style="font-size: 0.95rem; letter-spacing: 1px;">加载中…</div></div>
+                            </div>
+                            <div class="video-info-bar"><h4 class="heavy-italic">基础版</h4><span class="video-badge heavy-italic">RESULT 01</span></div>
+                        </div>
+                        <div class="video-card" style="padding: 0; border-radius: 12px;">
+                            <div class="video-wrapper is-ready" style="aspect-ratio: 9 / 16;">
+                                <video src="videos/ai-image-model-output-b.mp4" controls preload="metadata" playsinline muted></video>
+                                <div class="video-loading" aria-hidden="true"><div class="spinner"></div><div style="font-size: 0.95rem; letter-spacing: 1px;">加载中…</div></div>
+                            </div>
+                            <div class="video-info-bar"><h4 class="heavy-italic">进阶版</h4><span class="video-badge heavy-italic">RESULT 02</span></div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- 视频 2（右侧）：AI 教练 -->
-            <div class="video-card gs-reveal">
-                <div class="video-wrapper is-ready">
-                    <video src="videos/video-1.mp4" 
-                           controls 
-                           poster="images/video-cover-1.jpg" 
-                           preload="metadata" 
-                           playsinline>
-                    </video>
-                    <div class="video-loading" aria-hidden="true">
-                        <div class="spinner"></div>
-                        <div style="font-size: 0.95rem; letter-spacing: 1px;">加载中…</div>
+        <div class="z-row gs-reveal" style="margin-bottom: 0;">
+            <div class="z-text">
+                <h3 class="heavy-italic">AI <span class="gradient-text">动态矫正</span></h3>
+                <p>以单个竖版视频为主视觉，展示算法对动作连贯性、姿态稳定性和细节偏差的修正能力，文案区域后续补充结果说明。</p>
+            </div>
+            <div class="z-img-placeholder has-img" style="height: auto; min-height: 420px; padding: 18px;">
+                <div style="display: grid; grid-template-columns: 1fr 0.9fr; gap: 14px; align-items: stretch; width: 100%; height: 100%;">
+                    <div class="video-card" style="padding: 0; border-radius: 12px;">
+                        <div class="video-wrapper is-ready" style="aspect-ratio: 9 / 16;">
+                            <video src="videos/ai-dynamic-correction.mp4" controls preload="metadata" playsinline muted></video>
+                            <div class="video-loading" aria-hidden="true"><div class="spinner"></div><div style="font-size: 0.95rem; letter-spacing: 1px;">加载中…</div></div>
+                        </div>
+                        <div class="video-info-bar"><h4 class="heavy-italic">动态矫正视频</h4><span class="video-badge heavy-italic">AI CORRECTION</span></div>
                     </div>
-                </div>
-                <div class="video-info-bar">
-                    <h4 class="heavy-italic">AI动态矫正</h4>
-                    <span class="video-badge heavy-italic">AI RENDER</span>
+                    <div class="glass-panel" style="padding: 18px; border-radius: 12px; display: flex; flex-direction: column; gap: 14px;">
+                        <div>
+                            <h4 class="heavy-italic" style="font-size: 1.2rem; margin-bottom: 8px;">文案位</h4>
+                            <p style="color: var(--text-muted); font-size: 1rem;">这里放未定文案，建议直接描述矫正结果和提升点。</p>
+                        </div>
+                        <div style="display:flex; flex-wrap: wrap; gap: 10px;">
+                            <span class="video-badge heavy-italic">姿态校准</span>
+                            <span class="video-badge heavy-italic">轨迹优化</span>
+                            <span class="video-badge heavy-italic">细节补偿</span>
+                            <span class="video-badge heavy-italic">动态稳定</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -682,53 +792,17 @@
             bgTargets.forEach(loadBg);
         }
 
-        // 视频：快网速/缓存不闪遮罩；首帧慢于阈值再显示；播放中卡顿立即提示
+        // 视频：默认先显示播放器，避免灰色遮罩误判为不可播放
         document.querySelectorAll('.video-wrapper').forEach(wrapper => {
             const video = wrapper.querySelector('video');
             if (!video) return;
 
-            let slowTimer = null;
+            wrapper.classList.add('is-ready');
 
-            const hideOverlay = () => {
-                if (slowTimer) {
-                    clearTimeout(slowTimer);
-                    slowTimer = null;
-                }
-                wrapper.classList.add('is-ready');
-            };
-
-            const showOverlay = () => {
-                if (slowTimer) {
-                    clearTimeout(slowTimer);
-                    slowTimer = null;
-                }
-                wrapper.classList.remove('is-ready');
-            };
-
-            const scheduleSlowOverlay = () => {
-                if (slowTimer) clearTimeout(slowTimer);
-                slowTimer = setTimeout(() => {
-                    slowTimer = null;
-                    wrapper.classList.remove('is-ready');
-                }, MEDIA_SLOW_MS);
-            };
-
-            video.addEventListener('loadstart', () => {
-                if (video.readyState < 3) scheduleSlowOverlay();
-            });
-
-            video.addEventListener('loadeddata', () => {
-                if (video.readyState >= 3) hideOverlay();
-            });
-
-            video.addEventListener('canplay', hideOverlay);
-            video.addEventListener('playing', hideOverlay);
-            video.addEventListener('error', hideOverlay);
-
-            video.addEventListener('waiting', showOverlay);
-            video.addEventListener('stalled', showOverlay);
-
-            if (video.readyState >= 3) hideOverlay();
+            video.addEventListener('loadeddata', () => wrapper.classList.add('is-ready'));
+            video.addEventListener('canplay', () => wrapper.classList.add('is-ready'));
+            video.addEventListener('playing', () => wrapper.classList.add('is-ready'));
+            video.addEventListener('error', () => wrapper.classList.add('is-ready'));
         });
     </script>
 </body>
